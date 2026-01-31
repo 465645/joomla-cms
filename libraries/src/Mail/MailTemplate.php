@@ -449,44 +449,47 @@ class MailTemplate
     {
         foreach ($tags as $key => $value) {
             // If the value is NULL, replace with an empty string. NULL itself throws notices
-            if (\is_null($value)) {
+            if ($value === null) {
                 $value = '';
             }
 
-            $escapeIfNecessary = function($value) use ($isHtml, $key): string {
+            $escapeIfNecessary = function ($value) use ($isHtml, $key): string {
                 if ($isHtml && \in_array(strtoupper($key), $this->unsafe_tags, true)) {
                     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
                 }
+
                 return $value;
             };
 
             if (\is_array($value)) {
                 $matches = [];
+                // Case insensitive check for the key
                 $pregKey = preg_quote(strtoupper($key), '/');
 
-                if (preg_match_all('/{' . $pregKey . '}(.*?){\/' . $pregKey . '}/s', $text, $matches)) {
+                if (preg_match_all('/{' . $pregKey . '}(.*?){\/' . $pregKey . '}/is', $text, $matches)) {
                     foreach ($matches[0] as $i => $match) {
                         $replacement = '';
 
                         foreach ($value as $name => $subvalue) {
-                            if (\is_array($subvalue) && $name == $matches[1][$i]) {
+                            if (\is_array($subvalue) && strcasecmp($name, $matches[1][$i]) === 0) {
                                 $subvalue = implode("\n", $subvalue);
                                 $subvalue = $escapeIfNecessary($subvalue);
-                                $replacement .= $subvalue;
+
+                                $replacement .= implode("\n", $subvalue);
                             } elseif (\is_array($subvalue)) {
                                 $replacement .= $this->replaceTags($matches[1][$i], $subvalue, $isHtml);
-                            } elseif (\is_string($subvalue) && $name == $matches[1][$i]) {
+                            } elseif (\is_string($subvalue) && strcasecmp($name, $matches[1][$i]) === 0) {
                                 $subvalue = $escapeIfNecessary($subvalue);
                                 $replacement .= $subvalue;
                             }
                         }
 
-                        $text = str_ireplace($match, $replacement, $text);
+                        $text = str_replace($match, $replacement, $text);
                     }
                 }
             } else {
                 $value = $escapeIfNecessary($value);
-                $text = str_ireplace('{' . strtoupper($key) . '}', $value, $text);
+                $text  = str_ireplace('{' . strtoupper($key) . '}', $value, $text);
             }
         }
 
