@@ -6,7 +6,6 @@ class TableColumns {
     this.$table = $table;
     this.tableName = tableName;
     this.storageKey = `joomla-tablecolumns-${this.tableName}`;
-
     this.$headers = [].slice.call($table.querySelector('thead tr').children);
     this.$rows = $table.querySelectorAll('tbody tr');
     this.listOfHidden = [];
@@ -34,7 +33,7 @@ class TableColumns {
     this.createControls();
 
     // Restore state
-    this.listOfHidden.forEach((index) => {
+    this.listOfHidden.forEach(index => {
       this.toggleColumn(index, true);
     });
   }
@@ -45,7 +44,6 @@ class TableColumns {
   createControls() {
     const $divouter = document.createElement('div');
     $divouter.setAttribute('class', 'dropdown float-end pb-2');
-
     const $divinner = document.createElement('div');
     $divinner.setAttribute('class', 'dropdown-menu dropdown-menu-end');
     $divinner.setAttribute('data-bs-popper', 'static');
@@ -59,7 +57,6 @@ class TableColumns {
     $button.setAttribute('data-bs-auto-close', 'false');
     $button.setAttribute('aria-haspopup', 'true');
     $button.setAttribute('aria-expanded', 'false');
-
     const $ul = document.createElement('ul');
     $ul.setAttribute('class', 'list-unstyled p-2 text-nowrap mb-0');
     $ul.setAttribute('id', 'columnList');
@@ -68,7 +65,6 @@ class TableColumns {
     this.$headers.forEach(($el, index) => {
       // Skip the first column, unless it's a th, as we don't want to display the checkboxes
       if (index === 0 && $el.nodeName !== 'TH') return;
-
       const $li = document.createElement('li');
       const $label = document.createElement('label');
       const $input = document.createElement('input');
@@ -82,43 +78,38 @@ class TableColumns {
       // Find the header name
       let $titleEl = $el.querySelector('span');
       let title = $titleEl ? $titleEl.textContent.trim() : '';
-
       if (!title) {
         $titleEl = $el.querySelector('span.visually-hidden') || $el;
         title = $titleEl.textContent.trim();
       }
-
       if (title.includes(':')) {
         title = title.split(':', 2)[1].trim();
       }
-
       $label.textContent = title;
       $label.insertAdjacentElement('afterbegin', $input);
       $li.appendChild($label);
       $ul.appendChild($li);
     });
-
     this.$table.insertAdjacentElement('beforebegin', $divouter);
     $divouter.appendChild($button);
     $divouter.appendChild($divinner);
     $divinner.appendChild($ul);
 
     // Listen to checkboxes change
-    $ul.addEventListener('change', (event) => {
+    $ul.addEventListener('change', event => {
       this.toggleColumn(parseInt(event.target.value, 10));
       this.saveState();
     });
 
     // Remove "media query" classes, which may prevent toggling from working.
-    this.$headers.forEach(($el) => {
+    this.$headers.forEach($el => {
       $el.classList.remove('d-none', 'd-xs-table-cell', 'd-sm-table-cell', 'd-md-table-cell', 'd-lg-table-cell', 'd-xl-table-cell', 'd-xxl-table-cell');
     });
-    this.$rows.forEach(($row) => {
-      [].slice.call($row.children).forEach(($el) => {
+    this.$rows.forEach($row => {
+      [].slice.call($row.children).forEach($el => {
         $el.classList.remove('d-none', 'd-xs-table-cell', 'd-sm-table-cell', 'd-md-table-cell', 'd-lg-table-cell', 'd-xl-table-cell', 'd-xxl-table-cell');
       });
     });
-
     this.$button = $button;
     this.$menu = $ul;
     this.updateCounter();
@@ -131,7 +122,6 @@ class TableColumns {
     // Don't count the checkboxes column in the total
     const total = this.$headers.length - 1;
     const visible = total - this.listOfHidden.length;
-
     this.$button.textContent = `${visible}/${total} ${Joomla.Text._('JGLOBAL_COLUMNS')}`;
   }
 
@@ -147,21 +137,16 @@ class TableColumns {
 
     // Skip the protected columns
     if (this.protectedCols.indexOf(index) !== -1) return;
-
     const i = this.listOfHidden.indexOf(index);
-
     if (i === -1) {
       this.listOfHidden.push(index);
     } else if (force !== true) {
       this.listOfHidden.splice(i, 1);
     }
-
     this.$headers[index].classList.toggle('d-none', force);
-
-    this.$rows.forEach(($col) => {
+    this.$rows.forEach($col => {
       $col.children[index].classList.toggle('d-none', force);
     });
-
     this.updateCounter();
   }
 
@@ -177,26 +162,21 @@ class TableColumns {
    */
   loadState() {
     const stored = window.localStorage.getItem(this.storageKey);
-
     if (stored) {
-      this.listOfHidden = stored.split(',').map((val) => parseInt(val, 10));
+      this.listOfHidden = stored.split(',').map(val => parseInt(val, 10));
     }
   }
 }
-
 if (window.innerWidth > 992) {
   // Look for dataset name else page-title
-  [...document.querySelectorAll('table:not(.columns-order-ignore)')].forEach(($table) => {
-    const tableName = ($table.dataset.name ? $table.dataset.name : document.querySelector('.page-title')?.textContent.trim()
-      .replace(/[^a-z0-9]/gi, '-')
-      .toLowerCase()
-    );
+  [...document.querySelectorAll('table:not(.columns-order-ignore)')].forEach($table => {
+    const tableName = $table.dataset.name 
+      || document.querySelector('.page-title')?.textContent?.trim()?.replace(/[^a-z0-9]/gi, '-')?.toLowerCase();
 
     // Skip unnamed table
     if (!tableName) {
       return;
     }
-
     new TableColumns($table, tableName);
   });
 }
