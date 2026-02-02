@@ -224,16 +224,16 @@ div.subform-repeatable-group {
 }
 
 // Calendar Highlighting in Frontend 
-.js-calendar .calendar-container .day.selected {
-  background-color: var(--cassiopeia-color-primary);
-  border: 1px solid var(--cassiopeia-color-primary);
-  color: #fff;
-  border-radius: 4px;
+.js-calendar .calendar-container tbody td.day.selected {
+  background-color: var(--cassiopeia-color-primary) !important;
+  border: 1px solid var(--cassiopeia-color-primary) !important;
+  color: #fff !important;
+  border-radius: 4px !important;
 }
 
 // Hover Effect
-.js-calendar .calendar-container .day:not(.disabled):not(.othermonth):hover {
-  background-color: var(--cassiopeia-color-primary);
-  color: #fff;
+.js-calendar .calendar-container tbody td.day:not(.disabled):not(.othermonth):hover {
+  background-color: var(--cassiopeia-color-primary) !important;
+  color: #fff !important;
   cursor: pointer;
 }
